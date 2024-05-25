@@ -6,8 +6,9 @@ from shapely.ops import unary_union
 from shapely.geometry import Polygon
 
 class dataTransformation:
-    def __init__(self, df):
+    def __init__(self, df,nyc):
         self.df = df
+        self.nyc = nyc
     
     def deleteCols(self):
         unncessaryCols = ['id','key']

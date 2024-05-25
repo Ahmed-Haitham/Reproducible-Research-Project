@@ -15,8 +15,9 @@ def main():
     nyc = Extract.readshp(filepathshp)
 
     # transform & data cleaning
-    transformer = Transform.dataTransformation(df)
+    transformer = Transform.dataTransformation(df,nyc)
     transformedDf = transformer.transform()
+    print(transformedDf)
 
 
 
