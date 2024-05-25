@@ -1,5 +1,9 @@
 import pandas as pd
 import numpy as np
+import geopandas as gpd
+from shapely.geometry import Point
+from shapely.ops import unary_union
+from shapely.geometry import Polygon
 
 class dataTransformation:
     def __init__(self, df):
@@ -14,152 +18,45 @@ class dataTransformation:
         self.df['passenger_big_group'] = self.df['passenger_big_group'].astype('category')
         self.df['fare_amount_log'] = np.log(self.df['fare_amount'])
 
-    
-    # def mappingCols(self):
-    #     def mapEducation(value):
-    #         if value == 1:
-    #             return "Below College"
-    #         elif value == 2:
-    #             return "College"
-    #         elif value == 3:
-    #             return "Bachelor"
-    #         elif value == 4:
-    #             return "Master"
-    #         else:
-    #             return "Doctor"
+    # Data Cleaning Pick Up missing Cords & Drop Off missing Cords
 
-    #     def mapEnvironmentSatisfaction(value):
-    #         if value == 1:
-    #             return "Low"
-    #         elif value == 2:
-    #             return "Medium"
-    #         elif value == 3:
-    #             return "High"
-    #         else:
-    #             return "Very High"
-    
-    #     def mapJobInvolvement(value):
-    #         if value == 1:
-    #             return "Low"
-    #         elif value == 2:
-    #             return "Medium"
-    #         elif value == 3:
-    #             return "High"
-    #         else:
-    #             return "Very High"
+    # 01 generate random numbers in NYC boundaries
+    def generateRandomPointsWithinPolygon(self, polygon, numPoints):
+        points = []
+        min_x, min_y, max_x, max_y = polygon.bounds
+        while len(points) < numPoints:
+            random_points = [Point(np.random.uniform(min_x, max_x), np.random.uniform(min_y, max_y)) for _ in range(numPoints)]
+            points.extend([point for point in random_points if polygon.contains(point)])
+        return points[:numPoints]
 
-                
-    #     def mapJobSatisfaction(value):
-    #         if value == 1:
-    #             return "Low"
-    #         elif value == 2:
-    #             return "Medium"
-    #         elif value == 3:
-    #             return "High"
-    #         else:
-    #             return "Very High"
-            
-    #     def mapPerformanceRating(value):
-    #         if value == 1:
-    #             return "Low"
-    #         elif value == 2:
-    #             return "Good"
-    #         elif value == 3:
-    #             return "Excellent"
-    #         else:
-    #             return "Outstanding"
+    # 02 fill missing coordinates
+    def fillCoordinates(self):
+        # Generate random coordinates for imputation within the NYC boundaries
+        nycUnion = unary_union(self.nyc.geometry)
 
-    #     def mapRelationshipSatisfaction(value):
-    #         if value == 1:
-    #             return "Low"
-    #         elif value == 2:
-    #             return "Medium"
-    #         elif value == 3:
-    #             return "High"
-    #         else:
-    #             return "Very High"
-            
-    #     def mapWorkLifeBalance(value):
-    #         if value == 1:
-    #             return "Bad"
-    #         elif value == 2:
-    #             return "Good"
-    #         elif value == 3:
-    #             return "Better"
-    #         else:
-    #             return "best"
-            
-    #     def mapBusinessTravel(value):
-    #         if value == "Non-Travel":
-    #             return 1
-    #         elif value =="Travel_Frequently":
-    #             return 2
-    #         else:
-    #             return 3
-            
-    #     def mapAttrition(value):
-    #         if value == "Yes":
-    #             return 1
-    #         else:
-    #             return 0
-        
-    #     self.df['educationChr'] = self.df['Education'].map(mapEducation)
-    #     self.df['EnvironmentSatisfactionChr'] = self.df['EnvironmentSatisfaction'].map(mapEnvironmentSatisfaction)
-    #     self.df['JobInvolvementChr'] = self.df['JobInvolvement'].map(mapJobInvolvement)
-    #     self.df['JobSatisfactionChr'] = self.df['JobSatisfaction'].map(mapJobSatisfaction)
-    #     self.df['PerformanceRatingChr'] = self.df['PerformanceRating'].map(mapPerformanceRating)
-    #     self.df['RelationshipSatisfactionChr'] = self.df['RelationshipSatisfaction'].map(mapRelationshipSatisfaction)
-    #     self.df['WorkLifeBalanceChr'] = self.df['WorkLifeBalance'].map(mapWorkLifeBalance)
-    #     self.df['BusinessTravelInt'] = self.df['BusinessTravel'].map(mapBusinessTravel)
-    #     self.df['AttritionInt'] = self.df['Attrition'].map(mapAttrition)
-    
-    # def ageBucket(self):
-    #     conditions = [
-    #         (self.df['Age'] <= 25),
-    #         (self.df['Age'] > 25) & (self.df['Age'] <= 35),
-    #         (self.df['Age'] > 35) & (self.df['Age'] <= 45),
-    #         (self.df['Age'] > 45) & (self.df['Age'] <= 55),
-    #         (self.df['Age'] > 55)
-    #         ]
-    #     results = ['18-25', '26-35', '36-45', '46-55','55+']
-    #     self.df['ageBucket'] = np.select(conditions, results)
+        ### pick up missings
+        missingPickup_coords = (self.df['pickup_longitude'] == 0) | (self.df['pickup_longitude'] > -72) | (self.df['pickup_latitude'] == 0)
+        num_missingPickup = sum(missingPickup_coords)
 
-    # def monthlyIncomeBucket(self):
-    #     conditions = [
-    #         (self.df['MonthlyIncome'] <= 5000),
-    #         (self.df['MonthlyIncome'] > 5000) & (self.df['MonthlyIncome'] <= 10000),
-    #         (self.df['MonthlyIncome'] > 10000) & (self.df['MonthlyIncome'] <= 15000),
-    #         (self.df['MonthlyIncome'] > 15000)
-    #         ]
-    #     results = ['Below 5k', '5-10k', '10-15k', 'Above 15k']
-    #     self.df['monthlyIncomeBucket'] = np.select(conditions, results)    
+        ### drop of missings
+        missingDropoff_coords = (self.df['dropoff_longitude'] == 0) | (self.df['dropoff_longitude'] < -75) | (self.df['dropoff_latitude'] == 0) | (self.df['dropoff_latitude'] > 42)
+        num_missingDropoff = sum(missingDropoff_coords)
 
+        # Generate random coordinates for missing pickup points
+        random_points_pickup = self.generateRandomPointsWithinPolygon(nycUnion, num_missingPickup)
+        random_coordinates_pickup = np.array([(point.x, point.y) for point in random_points_pickup])
+        # Generate random coordinates for missing dropoff points
+        random_points_dropoff = self.generateRandomPointsWithinPolygon(nycUnion, num_missingDropoff)
+        random_coordinates_dropoff = np.array([(point.x, point.y) for point in random_points_dropoff])
 
-    # def reorderCols(self):
-    #     self.df = self.df[[
-    #         #about the employee
-    #         'employeeCount','EmployeeNumber','Age','ageBucket','Gender','MaritalStatus','Department',
-    #         'Education','educationChr','EducationField',
-    #         # about the job
-    #         'BusinessTravelInt', 'BusinessTravel','DistanceFromHome',
-    #         'StockOptionLevel','TotalWorkingYears', 'TrainingTimesLastYear', 
-    #         'YearsAtCompany','YearsInCurrentRole','YearsSinceLastPromotion','YearsWithCurrManager','NumCompaniesWorked',
-    #         'JobInvolvement','JobInvolvementChr','JobLevel','JobRole',
-    #         # indicator
-    #         'WorkLifeBalance','WorkLifeBalanceChr',
-    #         'JobSatisfaction','JobSatisfactionChr',
-    #         'MonthlyIncome','monthlyIncomeBucket','OverTime', 'PercentSalaryHike',
-    #         # KPI
-    #         'RelationshipSatisfaction','RelationshipSatisfactionChr',
-    #         'PerformanceRating','PerformanceRatingChr',
-    #         'EnvironmentSatisfaction', 'EnvironmentSatisfactionChr',
-    #         'Attrition','AttritionInt']]
-        
+        # Impute the missing pickup and drop offs coordinates with random coordinates
+        self.df.loc[missingPickup_coords, 'pickup_longitude'] = random_coordinates_pickup[:, 0]
+        self.df.loc[missingPickup_coords, 'pickup_latitude'] = random_coordinates_pickup[:, 1]
+        self.df.loc[missingDropoff_coords, 'dropoff_longitude'] = random_coordinates_dropoff[:, 0]
+        self.df.loc[missingDropoff_coords, 'dropoff_latitude'] = random_coordinates_dropoff[:, 1]
+
     def transform(self):
         self.deleteCols()
         self.convertData()
-        # self.mappingCols()
-        # self.ageBucket()
-        # self.monthlyIncomeBucket()
-        # self.reorderCols()
+        self.fillCoordinates()
         return self.df
