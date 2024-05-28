@@ -9,6 +9,8 @@ class dataTransformation:
     def __init__(self, df,nyc):
         self.df = df
         self.nyc = nyc
+
+    # Delete Cols and Convert Data
     
     def deleteCols(self):
         unncessaryCols = ['id','key']
@@ -56,8 +58,19 @@ class dataTransformation:
         self.df.loc[missingDropoff_coords, 'dropoff_longitude'] = random_coordinates_dropoff[:, 0]
         self.df.loc[missingDropoff_coords, 'dropoff_latitude'] = random_coordinates_dropoff[:, 1]
 
+    # Extract datetime features
+
+    def extractDateTime(self):
+        self.df['pickup_datetime'] = pd.to_datetime(self.df['pickup_datetime'])
+        self.df['year'] = self.df['pickup_datetime'].dt.year
+        self.df['month'] = self.df['pickup_datetime'].dt.month
+        self.df['day'] = self.df['pickup_datetime'].dt.day
+        self.df['hour'] = self.df['pickup_datetime'].dt.hour
+
+
     def transform(self):
         self.deleteCols()
         self.convertData()
         self.fillCoordinates()
+        self.extractDateTime()
         return self.df

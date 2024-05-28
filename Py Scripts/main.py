@@ -17,7 +17,10 @@ def main():
     # transform & data cleaning
     transformer = Transform.dataTransformation(df,nyc)
     transformedDf = transformer.transform()
-    print(transformedDf)
+    # print(transformedDf)
+
+    # feature engineering
+    
 
 
 
