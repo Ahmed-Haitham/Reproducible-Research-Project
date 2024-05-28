@@ -3,6 +3,7 @@ import geopandas as gpd
 import numpy as np
 import Extract
 import Transform
+import clustering
 
 def main():
 
@@ -17,10 +18,14 @@ def main():
     # transform & data cleaning
     transformer = Transform.dataTransformation(df,nyc)
     transformedDf = transformer.transform()
-    # print(transformedDf)
 
     # feature engineering
-    
+
+    # clustering
+    cluster = clustering.pickUpCluster(transformedDf)
+    df = cluster.clusterCreated()
+    print(df)
+    print(df['pickup_cluster'].value_counts())
 
 
 
