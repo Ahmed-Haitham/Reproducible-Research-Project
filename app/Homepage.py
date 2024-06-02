@@ -73,7 +73,17 @@ elif page_options == 'Data Visualisation':
     #                        min_value=pd.to_datetime(df_transform['pickup_datetime'].min()), 
     #                        max_value=pd.to_datetime(df_transform['pickup_datetime'].max()))
 
-    sample_size = st.number_input('Insert sample size to visualize (from 0 to 1):', min_value=0, max_value=1, value=None)
+
+    # Buttons layout 
+    col1, col2 = st.columns(2)
+    with col1: 
+        # Select sample size to draw
+        sample_size = st.number_input('Insert sample size to visualize (from 0 to 1):', min_value=0, max_value=1, value=None)
+
+    with col2: 
+        # Select clustering method
+        clustering_method = st.selectbox('Select Clustering Method', ['None', 6])
+
 
     if sample_size:
         df_filtered = df_transform.sample(sample_size*df_transform.shape[0]) 
@@ -83,11 +93,9 @@ elif page_options == 'Data Visualisation':
 
     # # Filter DataFrame based on selected date range
     # df_filtered = df_transform[(df_transform['pickup_datetime'] >= date_range[0]) & (df_transform['pickup_datetime'] <= date_range[1])]
-    # Select clustering method
-    clustering_method = st.sidebar.selectbox('Select Clustering Method', ['None', 6])
+
 
     if clustering_method == 'None':
-
         # Map Scatter Plot with Plotly 
         fig = px.scatter_mapbox(df_filtered, 
                                 lon='pickup_longitude', 
@@ -114,7 +122,33 @@ elif page_options == 'Data Visualisation':
         st.plotly_chart(fig, use_container_width=True)
 
     else: 
-        pass
+        df_clustered = clustering.pickUpCluster(df_transform).clusterCreated()
+
+        # Map Scatter Plot with Plotly 
+        fig = px.scatter_mapbox(df_filtered, 
+                                lon='pickup_longitude', 
+                                lat='pickup_latitude', 
+                                #  color='passenger_count', 
+                                opacity = 0.5,
+                                zoom=8,  
+                                hover_data=['passenger_count'], 
+                                size = 'trip_distance', 
+                                color='pickup_cluster'
+                                #  color_continuous_scale='Tealgrn'
+                                )
+
+        fig.update_layout(
+            margin={"r":0,"t":0,"l":0,"b":0},
+            mapbox_style="open-street-map",
+            legend=dict(
+                orientation="h",
+                yanchor="bottom",
+                y=1.02,
+                xanchor="right",
+                x=1
+            ))
+
+        st.plotly_chart(fig, use_container_width=True)
 
 else: 
     df = load_data()
