@@ -24,13 +24,10 @@ class dataTransformation:
     # Data Cleaning Pick Up missing Cords & Drop Off missing Cords
 
     # 01 generate random numbers in NYC boundaries
-    def generateRandomPointsWithinPolygon(self, polygon, numPoints):
-        points = []
+    def generateRandomPointsWithinPolygon(self, polygon, num_points):
         min_x, min_y, max_x, max_y = polygon.bounds
-        while len(points) < numPoints:
-            random_points = [Point(np.random.uniform(min_x, max_x), np.random.uniform(min_y, max_y)) for _ in range(numPoints)]
-            points.extend([point for point in random_points if polygon.contains(point)])
-        return points[:numPoints]
+        random_points = np.random.uniform((min_x, min_y), (max_x, max_y), size=(num_points, 2))
+        return random_points
 
     # 02 fill missing coordinates
     def fillCoordinates(self):
@@ -45,19 +42,15 @@ class dataTransformation:
         missingDropoff_coords = (self.df['dropoff_longitude'] == 0) | (self.df['dropoff_longitude'] < -75) | (self.df['dropoff_latitude'] == 0) | (self.df['dropoff_latitude'] > 42)
         num_missingDropoff = sum(missingDropoff_coords)
 
-        # Generate random coordinates for missing pickup points
+        # Generate random coordinates for missing pickup& dropoff points
         random_points_pickup = self.generateRandomPointsWithinPolygon(nycUnion, num_missingPickup)
-        random_coordinates_pickup = np.array([(point.x, point.y) for point in random_points_pickup])
-        # Generate random coordinates for missing dropoff points
         random_points_dropoff = self.generateRandomPointsWithinPolygon(nycUnion, num_missingDropoff)
-        random_coordinates_dropoff = np.array([(point.x, point.y) for point in random_points_dropoff])
-
+        
         # Impute the missing pickup and drop offs coordinates with random coordinates
-        self.df.loc[missingPickup_coords, 'pickup_longitude'] = random_coordinates_pickup[:, 0]
-        self.df.loc[missingPickup_coords, 'pickup_latitude'] = random_coordinates_pickup[:, 1]
-        self.df.loc[missingDropoff_coords, 'dropoff_longitude'] = random_coordinates_dropoff[:, 0]
-        self.df.loc[missingDropoff_coords, 'dropoff_latitude'] = random_coordinates_dropoff[:, 1]
-
+        self.df.loc[missingPickup_coords, 'pickup_longitude'] = random_points_pickup[:, 0]
+        self.df.loc[missingPickup_coords, 'pickup_latitude'] = random_points_pickup[:, 1]
+        self.df.loc[missingDropoff_coords, 'dropoff_longitude'] = random_points_dropoff[:, 0]
+        self.df.loc[missingDropoff_coords, 'dropoff_latitude'] = random_points_dropoff[:, 1]
     # Extract datetime features
 
     def extractDateTime(self):
