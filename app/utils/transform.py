@@ -1,6 +1,8 @@
 import pandas as pd
 import numpy as np
 import geopandas as gpd
+import shapefile
+
 from shapely.geometry import Point
 from shapely.ops import unary_union
 from shapely.geometry import Polygon
@@ -23,15 +25,31 @@ class dataTransformation:
     # Data Cleaning Pick Up missing Cords & Drop Off missing Cords
 
     # 01 generate random numbers in NYC boundaries
-    def generateRandomPointsWithinPolygon(self, polygon, num_points):
-        min_x, min_y, max_x, max_y = polygon.bounds
-        random_points = np.random.uniform((min_x, min_y), (max_x, max_y), size=(num_points, 2))
-        return random_points
+    def generateRandomPointsWithinPolygon(self, num_points,maparray):
+            np.random.seed(4326)
+            size = num_points
+            min_longitude, max_longitude = maparray[:, 0].min(), maparray[:, 0].max()
+            min_latitude, max_latitude = maparray[:, 1].min(), maparray[:, 1].max()
+            random_longitudes = np.random.uniform(min_longitude, max_longitude, size)
+            random_latitudes = np.random.uniform(min_latitude, max_latitude, size)
+            random_coordinates = np.column_stack((random_longitudes, random_latitudes))
+            return random_coordinates
 
     # 02 fill missing coordinates
     def fillCoordinates(self):
-        # Generate random coordinates for imputation within the NYC boundaries
-        nycUnion = unary_union(self.nyc.geometry)
+        
+        # Read nyc polygon into array
+        nyc_coordinates = []
+        for shape_rec in self.nyc.shapeRecords():
+            shape = shape_rec.shape
+            if shape.shapeType == shapefile.POLYGON:
+                for i in range(len(shape.parts)):
+                    start = shape.parts[i]
+                    end = shape.parts[i + 1] if i + 1 < len(shape.parts) else len(shape.points)
+                    coords = shape.points[start:end]
+                    for coord in coords:
+                        nyc_coordinates.append([coord[0], coord[1]])
+        nyc_coordinates = np.array(nyc_coordinates)
 
         ### pick up missings
         missingPickup_coords = (self.df['pickup_longitude'] == 0) | (self.df['pickup_longitude'] > -72) | (self.df['pickup_latitude'] == 0)
@@ -42,8 +60,8 @@ class dataTransformation:
         num_missingDropoff = sum(missingDropoff_coords)
 
         # Generate random coordinates for missing pickup& dropoff points
-        random_points_pickup = self.generateRandomPointsWithinPolygon(nycUnion, num_missingPickup)
-        random_points_dropoff = self.generateRandomPointsWithinPolygon(nycUnion, num_missingDropoff)
+        random_points_pickup = self.generateRandomPointsWithinPolygon(num_missingPickup, nyc_coordinates)
+        random_points_dropoff = self.generateRandomPointsWithinPolygon(num_missingDropoff, nyc_coordinates)
         
         # Impute the missing pickup and drop offs coordinates with random coordinates
         self.df.loc[missingPickup_coords, 'pickup_longitude'] = random_points_pickup[:, 0]
