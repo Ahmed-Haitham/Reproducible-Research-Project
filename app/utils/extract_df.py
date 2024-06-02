@@ -7,5 +7,5 @@ def readcsv(filepath):
     return pd.read_csv(filepath)
 
 def readshp(filepath):
-    return shapefile.Reader(filepath)
+    return gpd.read_file(filepath)
 
