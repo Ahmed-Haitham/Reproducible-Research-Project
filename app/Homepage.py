@@ -26,10 +26,7 @@ def load_data():
 
 @st.cache
 def transform_data(df):
-    # Transform data using Dask for parallel processing
-    ddf = dd.from_pandas(df, npartitions=4)  # Convert DataFrame to Dask DataFrame
-    transformed_data = ddf.apply(transform.dataTransformation, nyc=nyc).compute()  # Apply transformation using Dask
-    return transformed_data
+    pass 
 
 def stats_page(dataframe): 
     # Button to trigger transformation
@@ -53,11 +50,8 @@ def stats_page(dataframe):
     st.header('Descriptive Statistics')
     st.write(dataframe.describe())
 
-
-
 def visuals_page(dataframe, lon, lat): 
     pass
-
 
 def model_page(dataframe): 
     pass
@@ -70,28 +64,57 @@ if page_options == 'Data Statistics':
 elif page_options == 'Data Visualisation': 
     st.header('Map Visualisation')
     df_transform = load_data()
+    df_transform = transform.dataTransformation(
+            df=df_transform, nyc=nyc
+        ).transform()
 
-    # Map Scatter Plot with Plotly 
-    fig = px.scatter_mapbox(df_transform, 
-    lon='pickup_longitude', 
-    lat='pickup_latitude', 
-    color='passenger_count', 
-    zoom = 6, 
-    opacity=0.7, 
-    hover_data= ['passenger_count'])
+    # Slider for selecting date range
+    # date_range = st.slider('Select a range of dates you would like to map:', 
+    #                        min_value=pd.to_datetime(df_transform['pickup_datetime'].min()), 
+    #                        max_value=pd.to_datetime(df_transform['pickup_datetime'].max()))
 
-    fig.update_layout(
-        margin={"r":0,"t":0,"l":0,"b":1},
-        mapbox_style="open-street-map",
-        legend=dict(
-            orientation="h",
-            yanchor="bottom",
-            y=1.02,
-            xanchor="right",
-            x=1
-        ))
+    sample_size = st.number_input('Insert sample size to visualize (from 0 to 1):', min_value=0, max_value=1, value=None)
 
-    st.plotly_chart(fig)
+    if sample_size:
+        df_filtered = df_transform.sample(sample_size*df_transform.shape[0]) 
+
+    else: 
+        df_filtered = df_transform
+
+    # # Filter DataFrame based on selected date range
+    # df_filtered = df_transform[(df_transform['pickup_datetime'] >= date_range[0]) & (df_transform['pickup_datetime'] <= date_range[1])]
+    # Select clustering method
+    clustering_method = st.sidebar.selectbox('Select Clustering Method', ['None', 6])
+
+    if clustering_method == 'None':
+
+        # Map Scatter Plot with Plotly 
+        fig = px.scatter_mapbox(df_filtered, 
+                                lon='pickup_longitude', 
+                                lat='pickup_latitude', 
+                                #  color='passenger_count', 
+                                opacity = 0.5,
+                                zoom=8,  
+                                hover_data=['passenger_count'], 
+                                size = 'trip_distance', 
+                                #  color_continuous_scale='Tealgrn'
+                                )
+
+        fig.update_layout(
+            margin={"r":0,"t":0,"l":0,"b":0},
+            mapbox_style="open-street-map",
+            legend=dict(
+                orientation="h",
+                yanchor="bottom",
+                y=1.02,
+                xanchor="right",
+                x=1
+            ))
+
+        st.plotly_chart(fig, use_container_width=True)
+
+    else: 
+        pass
 
 else: 
     df = load_data()

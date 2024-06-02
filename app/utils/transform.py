@@ -11,7 +11,6 @@ class dataTransformation:
         self.nyc = nyc
 
     # Delete Cols and Convert Data
-    
     def deleteCols(self):
         unncessaryCols = ['id','key']
         self.df.drop(columns = unncessaryCols, inplace=True)
@@ -60,10 +59,41 @@ class dataTransformation:
         self.df['day'] = self.df['pickup_datetime'].dt.day
         self.df['hour'] = self.df['pickup_datetime'].dt.hour
 
+     # Calculate trip distance
+    def calculate_trip_distance(self):
+        """ 
+        Function to calculate Harvesine distance based on pickup and dropoff coordinates. 
+        Author: Irena Zimovska
+        """
+        def haversine_distance(lat1, lon1, lat2, lon2):
+            """
+            Calculate the great-circle distance between two points 
+            on the Earth's surface given their latitude and longitude
+            in decimal degrees.
+            """
+            # Convert decimal degrees to radians
+            lat1, lon1, lat2, lon2 = map(np.radians, [lat1, lon1, lat2, lon2])
+
+            # Haversine formula
+            dlon = lon2 - lon1
+            dlat = lat2 - lat1
+            a = np.sin(dlat/2)**2 + np.cos(lat1) * np.cos(lat2) * np.sin(dlon/2)**2
+            c = 2 * np.arcsin(np.sqrt(a))
+            
+            # Radius of Earth in kilometers is 6371
+            km = 6371 * c
+            return km
+        
+        self.df['trip_distance'] = haversine_distance(self.df['pickup_latitude'], 
+                                                       self.df['pickup_longitude'], 
+                                                       self.df['dropoff_latitude'], 
+                                                       self.df['dropoff_longitude'])
+
 
     def transform(self):
         self.deleteCols()
         self.convertData()
         self.fillCoordinates()
         self.extractDateTime()
+        self.calculate_trip_distance()
         return self.df
