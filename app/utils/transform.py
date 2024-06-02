@@ -40,11 +40,11 @@ class dataTransformation:
         
         ### pick up missings
         missingPickup_coords = (self.df['pickup_longitude'] == 0) | (self.df['pickup_longitude'] > -72) | (self.df['pickup_latitude'] == 0)
-        self.df[~missingPickup_coords]
+        self.df = self.df[~missingPickup_coords]
 
         ### drop of missings
         missingDropoff_coords = (self.df['dropoff_longitude'] == 0) | (self.df['dropoff_longitude'] < -75) | (self.df['dropoff_latitude'] == 0) | (self.df['dropoff_latitude'] > 42)
-        self.df[~missingDropoff_coords]
+        self.df = self.df[~missingDropoff_coords]
 
         # # Generate random coordinates for missing pickup& dropoff points
         # random_points_pickup = self.generateRandomPointsWithinPolygon(num_missingPickup, nyc_coordinates)
