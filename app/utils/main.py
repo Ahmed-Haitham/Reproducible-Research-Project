@@ -4,6 +4,7 @@ import numpy as np
 import utils.extract_df as extract_df
 import utils.transform as transform
 import utils.clustering as clustering
+import utils.Feature_Engineering as Feature_Engineering
 
 def main():
 
@@ -20,9 +21,14 @@ def main():
     transformedDf = transformer.transform()
 
     # feature engineering
+    transformedDf['trip_distance'] = transformedDf.apply(Feature_Engineering.calculate_distance, axis=1)
+
+    # tempreature data
+    temperature_df = pd.read_csv('data/NYC_Weather_2016_2022.csv')
+    merged_df = Feature_Engineering.add_temperature(transformedDf, temperature_df)
 
     # clustering
-    cluster = clustering.pickUpCluster(transformedDf)
+    cluster = clustering.pickUpCluster(merged_df)
     df = cluster.clusterCreated()
     print(df)
     print(df['pickup_cluster'].value_counts())
