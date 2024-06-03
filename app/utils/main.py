@@ -21,10 +21,8 @@ def main():
     transformedDf = transformer.transform()
 
     # feature engineering
-    transformedDf['trip_distance'] = transformedDf.apply(Feature_Engineering.calculate_distance, axis=1)
-
-    # tempreature data
-    temperature_df = pd.read_csv('data/NYC_Weather_2016_2022.csv')
+    filepathtemp = "data/NYC_Weather_2016_2022.csv"
+    temperature_df = extract_df.readcsv(filepathtemp)
     merged_df = Feature_Engineering.add_temperature(transformedDf, temperature_df)
 
     # clustering
