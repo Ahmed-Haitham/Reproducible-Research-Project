@@ -61,4 +61,4 @@ class TrainRF:
 
     def save_best_model(self, file_path):
         # Save the model to the given file path
-        joblib.dump(best_model, file_path, compress=1)
+        joblib.dump(self.best_model, file_path, compress=1)
