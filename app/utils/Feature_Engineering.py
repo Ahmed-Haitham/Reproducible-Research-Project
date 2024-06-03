@@ -1,12 +1,5 @@
 import pandas as pd
 import numpy as np
-from geopy.distance import distance
-
-# Function to calculate distance
-def calculate_distance(trip):
-    pickup_coords = (trip['pickup_latitude'], trip['pickup_longitude'])
-    dropoff_coords = (trip['dropoff_latitude'], trip['dropoff_longitude'])
-    return distance(pickup_coords, dropoff_coords).km
 
 # Function to add temperature
 def add_temperature(trips_df, temperature_df):
