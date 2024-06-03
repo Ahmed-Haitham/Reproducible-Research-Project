@@ -1,4 +1,4 @@
-# Github Copilot 
+# Github Copilot was used to comment the code
 import pandas as pd
 from sklearn.metrics import root_mean_squared_error
 from sklearn.model_selection import train_test_split
@@ -42,7 +42,7 @@ class TrainRF:
         best_score = grid_search.best_score_
 
         # Initialize the model with the best parameters
-        best_model = RandomForestRegressor(**best_params)
+        best_model = RandomForestRegressor(**best_params,criterion="squared_error", random_state=self.seed)
 
         # Train the model
         best_model.fit(X_train, y_train)
