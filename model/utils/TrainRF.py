@@ -16,6 +16,7 @@ class TrainRF:
         self.test_split = test_split
         self.kfolds = kfolds
         self.error_metric = error_metric
+        self.best_model = None
 
     def train_model(self):
         # Split the dataframe into features and target
