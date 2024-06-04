@@ -21,7 +21,7 @@ def main():
     transformedDf = transformer.transform()
 
     # feature engineering
-    filepathtemp = "data/NYC_Weather_2016_2022.csv"
+    filepathtemp = "data/NYC_Weather_2014_2020.csv"
     temperature_df = extract_df.readcsv(filepathtemp)
     merged_df = Feature_Engineering.add_temperature(transformedDf, temperature_df)
 
