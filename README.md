@@ -35,7 +35,7 @@ We welcome contributions from the community. Please follow these guidelines:
 
 ## Authors and Acknowledgments
 - **Authors**: Ahmed Haitham, Jakub Bandurski, Irena Zimovska, Pearly Tantra
-- **Acknowledgments**: We thank the contributors and the community for their valuable feedback and support.
+- **Acknowledgments**: We thank the contributors and the community for their valuable feedback and support. Special thanks to @jzmujdzin for inspiration to use streamlit. 
 
 ---
 For more details, visit the project repository on [Github]

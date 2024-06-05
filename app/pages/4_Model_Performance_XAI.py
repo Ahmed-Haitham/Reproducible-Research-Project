@@ -6,6 +6,7 @@ from utils import extract_df, transform
 import shap 
 import matplotlib.pyplot as plt 
 
+st.title("NYC Taxi Fares Prediction Explorer")
 st.header('ML Models Performance')
 
 tab1, tab2 = st.tabs(["Cross Validation Metrics", "eXplainable ML"])
