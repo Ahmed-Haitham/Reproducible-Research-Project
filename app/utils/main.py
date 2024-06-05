@@ -4,7 +4,7 @@ import numpy as np
 import utils.extract_df as extract_df
 import utils.transform as transform
 import utils.clustering as clustering
-import utils.Feature_Engineering as Feature_Engineering
+import utils.feature_engineering as feature_engineering
 
 def main():
 
@@ -23,7 +23,7 @@ def main():
     # feature engineering
     filepathtemp = "data/NYC_Weather_2014_2020.csv"
     temperature_df = extract_df.readcsv(filepathtemp)
-    merged_df = Feature_Engineering.add_temperature(transformedDf, temperature_df)
+    merged_df = feature_engineering.add_temperature(transformedDf, temperature_df)
 
     # clustering
     cluster = clustering.pickUpCluster(merged_df)
