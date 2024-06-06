@@ -12,6 +12,7 @@ st.header('ML Models Performance')
 tab1, tab2 = st.tabs(["Cross Validation Metrics", "eXplainable ML"])
 
 with tab1: 
+    st.markdown('Original RMSE for XgBoost model is 0.143.')
     option = st.selectbox('Select the model of interest:', options=['RF_log', 'RF', 'XGB_log', 'XGB'])
 
     import pickle
