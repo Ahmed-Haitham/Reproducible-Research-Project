@@ -8,7 +8,7 @@ Taxi fare prediction entails estimating the fare amount for a taxi trip based on
 
 ## Project Overview
 - **Dataset** : taxi_data, NYC geospatial data, NYCtemperature
-- *Tools**:
+- **Tools**:
   - **Dashboard** : Created by Streamlit
   - **ETL, Feature Engineering, Model** : conducted using Python
   - **Version Control**: Collaboration through GIT
