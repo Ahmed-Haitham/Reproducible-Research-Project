@@ -35,11 +35,11 @@ We welcome contributions from the community. Please follow these guidelines:
 
 ## Authors and Acknowledgments
 - **Authors**: Ahmed Haitham, Jakub Bandurski, Irena Zimovska, Pearly Tantra
-- **Acknowledgments**: We thank the contributors and the community for their valuable feedback and support. Special thanks to @jzmujdzin for inspiration to use streamlit. 
+- **Acknowledgments**: We thank our tutor Jakub Michanków @glowform for valuable insights and giving freedom in project ideas. Special thanks to Kuba @jzmujdzin for inspiration to use streamlit. 
 
 ---
 For more details, visit the project repository on [Github]
-(https://github.com/Ahmed-Haitham/Reproducible-Research-Project/tree/clustering)
+(https://github.com/Ahmed-Haitham/Reproducible-Research-Project/tree/main)
 
 
   
