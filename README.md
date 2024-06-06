@@ -35,8 +35,8 @@ We welcome contributions from the community. Please follow these guidelines:
 
 ## Authors and Acknowledgments
 - **Authors**: Ahmed Haitham, Jakub Bandurski, Irena Zimovska, Pearly Tantra
-- **Acknowledgments**: We thank our tutor Jakub Michanków @glowform for valuable insights and giving freedom in project ideas. Special thanks to Kuba @jzmujdzin for inspiration to use streamlit. 
-
+- **Acknowledgments**: We thank our tutor Jakub Michanków @glowform for valuable insights and giving freedom in project ideas. Special thanks to Kuba @jzmujdzin for inspiration to use streamlit.
+- **GenAI Utilization** : ChatGPT was used for consulting project structure and improving our writing in documentation. Copilot was used for generating comments in models.
 ---
 For more details, visit the project repository on [Github]
 (https://github.com/Ahmed-Haitham/Reproducible-Research-Project/tree/main)
